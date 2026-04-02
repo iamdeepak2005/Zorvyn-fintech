@@ -1,0 +1,312 @@
+﻿python : INFO  [alembic.ru
+ntime.migration] Context 
+impl PostgresqlImpl.
+At line:1 char:42
++ ... txt -Force; python 
+-c "from alembic.config 
+import Config; from 
+alembi ...
++                 ~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (I  
+  NFO  [alembic....Post   
+ gresqlImpl.:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+INFO  [alembic.runtime.mig
+ration] Will assume 
+transactional DDL.
+INFO  [alembic.runtime.mig
+ration] Running upgrade  
+-> 001_initial, initial 
+schema
+Traceback (most recent 
+call last):
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\base.p
+y", line 1967, in 
+_exec_single_context
+    
+self.dialect.do_execute(
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\defaul
+t.py", line 924, in 
+do_execute
+    
+cursor.execute(statement, 
+parameters)
+psycopg2.errors.DuplicateO
+bject: type "user_role" 
+already exists
+
+
+The above exception was 
+the direct cause of the 
+following exception:
+
+Traceback (most recent 
+call last):
+  File "<string>", line 
+1, in <module>
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\command.py", 
+line 403, in upgrade
+    script.run_env()
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\script\base.py",
+ line 583, in run_env
+    util.load_python_file(
+self.dir, "env.py")
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\util\pyfiles.py"
+, line 95, in 
+load_python_file
+    module = 
+load_module_py(module_id, 
+path)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\util\pyfiles.py"
+, line 113, in 
+load_module_py
+    spec.loader.exec_modul
+e(module)  # type: ignore
+  File "<frozen importlib.
+_bootstrap_external>", 
+line 783, in exec_module
+  File "<frozen 
+importlib._bootstrap>", 
+line 219, in 
+_call_with_frames_removed
+  File "alembic\env.py", 
+line 67, in <module>
+    
+run_migrations_online()
+  File "alembic\env.py", 
+line 61, in 
+run_migrations_online
+    
+context.run_migrations()
+  File "<string>", line 
+8, in run_migrations
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\runtime\environm
+ent.py", line 948, in 
+run_migrations
+    self.get_context().run
+_migrations(**kw)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\runtime\migratio
+n.py", line 627, in 
+run_migrations
+    
+step.migration_fn(**kw)
+  File "C:\Users\deepa\zor
+vyn-fintech\alembic\versio
+ns\001_initial_schema.py",
+ line 25, in upgrade
+    op.create_table(
+  File "<string>", line 
+8, in create_table
+  File "<string>", line 
+3, in create_table
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\operations\ops.p
+y", line 1311, in 
+create_table
+    return 
+operations.invoke(op)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\operations\base.
+py", line 445, in invoke
+    return fn(self, 
+operation)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\operations\toimp
+l.py", line 131, in 
+create_table
+    operations.impl.create
+_table(table)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\alembic\ddl\impl.py", 
+line 363, in create_table
+    table.dispatch.before_
+create(
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\event\attr.py
+", line 497, in __call__
+    fn(*args, **kw)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\util\langhelp
+ers.py", line 852, in 
+__call__
+    return 
+getattr(self.target, 
+self.name)(*arg, **kw)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\sql\sqltypes.
+py", line 1120, in 
+_on_table_create
+    t._on_table_create(tar
+get, bind, **kw)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\dialects\post
+gresql\named_types.py", 
+line 98, in 
+_on_table_create
+    
+self.create(bind=bind, 
+checkfirst=checkfirst)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\dialects\post
+gresql\named_types.py", 
+line 338, in create
+    super().create(bind, 
+checkfirst=checkfirst)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\dialects\post
+gresql\named_types.py", 
+line 51, in create
+    bind._run_ddl_visitor(
+self.DDLGenerator, self, 
+checkfirst=checkfirst)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\base.p
+y", line 2457, in 
+_run_ddl_visitor
+    visitorcallable(self.d
+ialect, self, **kwargs).tr
+averse_single(element)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\sql\visitors.
+py", line 664, in 
+traverse_single
+    return meth(obj, **kw)
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\dialects\post
+gresql\named_types.py", 
+line 153, in visit_enum
+    self.connection.execut
+e(CreateEnumType(enum))
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\base.p
+y", line 1418, in execute
+    return meth(
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\sql\ddl.py", 
+line 180, in 
+_execute_on_connection
+    return 
+connection._execute_ddl(
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\base.p
+y", line 1529, in 
+_execute_ddl
+    ret = 
+self._execute_context(
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\base.p
+y", line 1846, in 
+_execute_context
+    return 
+self._exec_single_context(
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\base.p
+y", line 1986, in 
+_exec_single_context
+    self._handle_dbapi_exc
+eption(
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\base.p
+y", line 2353, in 
+_handle_dbapi_exception
+    raise sqlalchemy_excep
+tion.with_traceback(exc_in
+fo[2]) from e
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\base.p
+y", line 1967, in 
+_exec_single_context
+    
+self.dialect.do_execute(
+  File "C:\Users\deepa\App
+Data\Local\Programs\Python
+\Python38\lib\site-package
+s\sqlalchemy\engine\defaul
+t.py", line 924, in 
+do_execute
+    
+cursor.execute(statement, 
+parameters)
+sqlalchemy.exc.Programming
+Error: (psycopg2.errors.Du
+plicateObject) type 
+"user_role" already exists
+
+[SQL: CREATE TYPE 
+user_role AS ENUM 
+('ADMIN', 'ANALYST', 
+'VIEWER')]
+(Background on this error 
+at: https://sqlalche.me/e/
+20/f405)
