@@ -17,11 +17,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Create enums
-    user_role = sa.Enum('ADMIN', 'ANALYST', 'VIEWER', name='user_role')
-    record_type = sa.Enum('INCOME', 'EXPENSE', name='record_type')
-    user_role.create(op.get_bind(), checkfirst=True)
-    record_type.create(op.get_bind(), checkfirst=True)
+    # Enums are created automatically by generic create_table commands in PostgreSQL
 
     # Users table
     op.create_table(
@@ -30,7 +26,7 @@ def upgrade() -> None:
         sa.Column('name', sa.String(length=100), nullable=False),
         sa.Column('email', sa.String(length=255), nullable=False),
         sa.Column('password_hash', sa.Text(), nullable=False),
-        sa.Column('role', sa.Enum('ADMIN', 'ANALYST', 'VIEWER', name='user_role', create_type=False), nullable=False),
+        sa.Column('role', sa.Enum('ADMIN', 'ANALYST', 'VIEWER', name='user_role'), nullable=False),
         sa.Column('is_active', sa.Boolean(), nullable=False, server_default=sa.text('true')),
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
         sa.PrimaryKeyConstraint('id'),
@@ -43,7 +39,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('amount', sa.Numeric(precision=15, scale=2), nullable=False),
-        sa.Column('type', sa.Enum('INCOME', 'EXPENSE', name='record_type', create_type=False), nullable=False),
+        sa.Column('type', sa.Enum('INCOME', 'EXPENSE', name='record_type'), nullable=False),
         sa.Column('category', sa.String(length=100), nullable=False),
         sa.Column('date', sa.Date(), nullable=False),
         sa.Column('notes', sa.Text(), nullable=True),
