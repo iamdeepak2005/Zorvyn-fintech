@@ -167,6 +167,8 @@ CORS_ORIGINS=http://localhost:3000
 
 ## 📡 API Endpoints
 
+**📖 Official API Documentation / Schemas:** [View Live Swagger UI (GitHub Pages)](https://iamdeepak2005.github.io/Zorvyn-fintech/)
+
 All endpoints are prefixed with `/api/v1`.
 
 ### Authentication
