@@ -71,7 +71,7 @@ class RecordService:
             raise
 
     def get_records(self, filters: RecordFilterParams, user: User) -> Tuple[List[dict], int]:
-        user_id = None if user.role == UserRole.ADMIN else user.id
+        user_id = None if user.role in [UserRole.ADMIN, UserRole.ANALYST] else user.id
         include_deleted = filters.include_deleted and user.role == UserRole.ADMIN
 
         records, total = self.record_repo.get_filtered(
@@ -94,8 +94,8 @@ class RecordService:
         if not record:
             raise ValueError(f"Record with id {record_id} not found")
 
-        # IDOR prevention
-        if user.role != UserRole.ADMIN and record.user_id != user.id:
+        # IDOR prevention (Admin and Analyst can view any record, others only their own)
+        if user.role not in [UserRole.ADMIN, UserRole.ANALYST] and record.user_id != user.id:
             raise PermissionError("You do not have access to this record")
 
         return RecordResponse.model_validate(record).model_dump(mode="json")
@@ -147,7 +147,7 @@ class RecordService:
 
     def get_export_records(self, user: User, record_type: Optional[RecordType] = None,
                            category: Optional[str] = None, start_date=None, end_date=None, search: Optional[str] = None):
-        user_id = None if user.role == UserRole.ADMIN else user.id
+        user_id = None if user.role in [UserRole.ADMIN, UserRole.ANALYST] else user.id
         yield from self.record_repo.get_for_export(
             user_id=user_id, record_type=record_type, category=category,
             start_date=start_date, end_date=end_date, search=search,

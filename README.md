@@ -223,7 +223,7 @@ GET /api/v1/records?type=EXPENSE&category=Rent&start_date=2026-01-01&end_date=20
 
 ## 🔒 Access Control Matrix
 
-| Endpoint                 | ADMIN    | ANALYST  | VIEWER   |
+| Endpoint                 |  ADMIN   | ANALYST  | VIEWER   |
 | ------------------------ | -------- | -------- | -------- |
 | POST /auth/login         | ✅       | ✅       | ✅       |
 | POST /admin/users        | ✅       | ❌       | ❌       |
@@ -231,11 +231,11 @@ GET /api/v1/records?type=EXPENSE&category=Rent&start_date=2026-01-01&end_date=20
 | PATCH /admin/users/{id}  | ✅       | ❌       | ❌       |
 | DELETE /admin/users/{id} | ✅       | ❌       | ❌       |
 | POST /records            | ✅       | ❌       | ❌       |
-| GET /records             | ✅ (all) | ✅ (own) | ✅ (own) |
-| GET /records/{id}        | ✅ (all) | ✅ (own) | ✅ (own) |
+| GET /records             | ✅ (all) | ✅ (all) | ❌       |
+| GET /records/{id}        | ✅ (all) | ✅ (all) | ❌       |
 | PATCH /records/{id}      | ✅       | ❌       | ❌       |
 | DELETE /records/{id}     | ✅       | ❌       | ❌       |
-| GET /dashboard/\*        | ✅       | ✅       | ❌       |
+| GET /dashboard/\*        | ✅       | ✅       | ✅       |
 | GET /records/export      | ✅       | ✅       | ❌       |
 | GET /health              | ✅       | ✅       | ✅       |
 
