@@ -73,11 +73,7 @@ app/
 
 ### Data Flow
 
-```
-Request → Middleware → Route → Service → Repository → Database
-                                  ↓
-                            Audit Service (logging)
-```
+![Data Flow](images/FlowChart.png)
 
 **Strict Rules:**
 
