@@ -39,8 +39,9 @@ async def create_record(data: RecordCreate, db: Session = Depends(get_db), user:
     """
     record_service = RecordService(db)
     try:
-        record_data, _ = record_service.create_record(data, user, idempotency_key)
-        return ApiResponse.ok(data=record_data)
+        record_data, is_idempotent = record_service.create_record(data, user, idempotency_key)
+        msg = "Idempotency hit: Returning cached response" if is_idempotent else "Record created successfully"
+        return ApiResponse.ok(data=record_data, message=msg)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

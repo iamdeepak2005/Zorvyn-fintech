@@ -13,11 +13,12 @@ class ErrorDetail(BaseModel):
 class ApiResponse(BaseModel, Generic[T]):
     success: bool
     data: Optional[T] = None
+    message: Optional[str] = None
     error: Optional[ErrorDetail] = None
 
     @classmethod
-    def ok(cls, data: Any = None) -> "ApiResponse":
-        return cls(success=True, data=data, error=None)
+    def ok(cls, data: Any = None, message: Optional[str] = None) -> "ApiResponse":
+        return cls(success=True, data=data, message=message, error=None)
 
     @classmethod
     def fail(cls, code: str, message: str) -> "ApiResponse":

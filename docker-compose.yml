@@ -38,7 +38,7 @@ services:
       - .env
     environment:
       # Docker network config to guarantee service connection overrides local .env
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-finance_db}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${DATABASE_PASSWORD_URL_ENCODED:-postgres}@db:5432/${POSTGRES_DB:-finance_db}
       ENV: ${ENV:-development}
     depends_on:
       db:
