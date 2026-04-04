@@ -24,8 +24,8 @@ router = APIRouter(prefix="/records", tags=["Financial Records"])
 
 
 @router.post("", summary="Create Financial Record", response_model=ApiResponse[RecordResponse], status_code=status.HTTP_201_CREATED)
-# Enforce ADMIN only through FastAPI Dependency Injection
-async def create_record(data: RecordCreate, db: Session = Depends(get_db), user: User = Depends(get_admin_user),
+# Enforce any authenticated user through FastAPI Dependency Injection
+async def create_record(data: RecordCreate, db: Session = Depends(get_db), user: User = Depends(get_any_authenticated_user),
                         idempotency_key: Optional[str] = Header(None, alias="Idempotency-Key")):
     """
     Creates a new financial record (Income/Expense).
@@ -36,6 +36,10 @@ async def create_record(data: RecordCreate, db: Session = Depends(get_db), user:
     3. The payload is passed to the `RecordService` which handles exactly two business layers:
        - Idempotency checks (preventing double-biling/duplicate submissions).
        - Database entry creation & Audit Logging (wrapped in a transaction).
+    
+    **Access Control:**
+    - **Roles Allowed:** ADMIN, ANALYST, VIEWER
+    - **Data Scope:** Own Records Only. (Users can only create records under their own `user_id`).
     """
     record_service = RecordService(db)
     try:
@@ -56,8 +60,8 @@ async def list_records(
     search: Optional[str] = Query(None), page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100), sort_by: Optional[str] = Query("date", regex="^(date|amount|created_at)$"),
     order: Optional[str] = Query("desc", regex="^(asc|desc)$"),
-    include_deleted: bool = Query(False),
-    db: Session = Depends(get_db), user: User = Depends(get_analyst_or_admin),
+    include_deleted: bool = Query(False), view_scope: str = Query("own", regex="^(own|all)$"),
+    db: Session = Depends(get_db), user: User = Depends(get_any_authenticated_user),
 ):
     """
     Fetches a paginated, filtered list of financial records.
@@ -67,13 +71,19 @@ async def list_records(
     2. Input query parameters are aggressively checked and assembled into `RecordFilterParams`.
     3. `RecordService` takes over and injects a "User ID Filter" context natively based on role 
        (limiting Analysts to their own scope but freeing Admins).
+       
+    **Access Control:**
+    - **Roles Allowed:** ADMIN, ANALYST, VIEWER
+    - **Data Scope:** 
+      - Viewers: Own Records Only.
+      - Analysts/Admins: Can query their own records (`?view_scope=own`) or the global dataset (`?view_scope=all`).
     """
     filters = RecordFilterParams(
         type=type, category=category, start_date=start_date, end_date=end_date,
         search=search, page=page, limit=limit, sort_by=sort_by, order=order, include_deleted=include_deleted,
     )
     record_service = RecordService(db)
-    records, total = record_service.get_records(filters, user)
+    records, total = record_service.get_records(filters, user, view_scope)
     return ApiResponse.ok(data=PaginatedData(
         items=records, total=total, page=page, limit=limit,
         total_pages=math.ceil(total / limit) if total > 0 else 0,
@@ -84,8 +94,8 @@ async def list_records(
 async def export_records(
     type: Optional[RecordType] = Query(None), category: Optional[str] = Query(None),
     start_date: Optional[date] = Query(None), end_date: Optional[date] = Query(None),
-    search: Optional[str] = Query(None),
-    db: Session = Depends(get_db), user: User = Depends(get_analyst_or_admin),
+    search: Optional[str] = Query(None), view_scope: str = Query("own", regex="^(own|all)$"),
+    db: Session = Depends(get_db), user: User = Depends(get_any_authenticated_user),
 ):
     """
     Compiles raw data into a fully formatted Excel file using openpyxl.
@@ -95,10 +105,16 @@ async def export_records(
        returns an unexecuted SQL generator (yield yield_per).
     2. `generate_excel_bytes` iteratively consumes the generator while applying 
        visual formatting (green/red typography based on values) to memory buffer.
+       
+    **Access Control:**
+    - **Roles Allowed:** ADMIN, ANALYST, VIEWER
+    - **Data Scope:** 
+      - Viewers: Own Records Only.
+      - Analysts/Admins: Can export their own records (`?view_scope=own`) or the global dataset (`?view_scope=all`).
     """
     record_service = RecordService(db)
     records_gen = record_service.get_export_records(
-        user=user, record_type=type, category=category, start_date=start_date, end_date=end_date, search=search,
+        user=user, record_type=type, category=category, start_date=start_date, end_date=end_date, search=search, view_scope=view_scope,
     )
     excel_bytes = generate_excel_bytes(records_gen)
     return Response(
@@ -109,7 +125,14 @@ async def export_records(
 
 
 @router.get("/{record_id}", summary="Get Financial Record", response_model=ApiResponse[RecordResponse])
-async def get_record(record_id: int, db: Session = Depends(get_db), user: User = Depends(get_analyst_or_admin)):
+async def get_record(record_id: int, db: Session = Depends(get_db), user: User = Depends(get_any_authenticated_user)):
+    """
+    Retrieves a single financial record by its direct ID.
+    
+    **Access Control:**
+    - **Roles Allowed:** ADMIN, ANALYST, VIEWER
+    - **Data Scope:** Viewers can strictly only view their own records. Admins and Analysts bypass ownership to view any specific record.
+    """
     record_service = RecordService(db)
     try:
         record = record_service.get_record_by_id(record_id, user)
@@ -123,8 +146,15 @@ async def get_record(record_id: int, db: Session = Depends(get_db), user: User =
 
 
 @router.patch("/{record_id}", summary="Update Financial Record", response_model=ApiResponse[RecordResponse])
-# Access locked to ADMIN using dependency injection
-async def update_record(record_id: int, data: RecordUpdate, db: Session = Depends(get_db), user: User = Depends(get_admin_user)):
+# Access locked to any authenticated user (service validates ownership)
+async def update_record(record_id: int, data: RecordUpdate, db: Session = Depends(get_db), user: User = Depends(get_any_authenticated_user)):
+    """
+    Updates specific fields of an existing financial record.
+    
+    **Access Control:**
+    - **Roles Allowed:** ADMIN, ANALYST, VIEWER
+    - **Data Scope:** Own Records Only. (Users can only update their own records, irrespective of their role).
+    """
     record_service = RecordService(db)
     try:
         record = record_service.update_record(record_id, data, user)
@@ -138,8 +168,15 @@ async def update_record(record_id: int, data: RecordUpdate, db: Session = Depend
 
 
 @router.delete("/{record_id}", summary="Delete Financial Record (Soft)", response_model=ApiResponse)
-# Access locked to ADMIN using dependency injection
-async def delete_record(record_id: int, db: Session = Depends(get_db), user: User = Depends(get_admin_user)):
+# Access locked to any authenticated user (service validates ownership)
+async def delete_record(record_id: int, db: Session = Depends(get_db), user: User = Depends(get_any_authenticated_user)):
+    """
+    Soft-deletes a financial record. 
+    
+    **Access Control:**
+    - **Roles Allowed:** ADMIN, ANALYST, VIEWER
+    - **Data Scope:** Own Records Only. (Users can only delete their own records, irrespective of their role).
+    """
     record_service = RecordService(db)
     try:
         record_service.delete_record(record_id, user)

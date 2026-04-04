@@ -25,6 +25,21 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 settings = get_settings()
 seed_database()
+tags_metadata = [
+    {
+        "name": "Dashboard Analytics",
+        "description": "Endpoints to compute aggregated financial data.\n\n**Visibility Scope (`view_scope`):**\n- **Analysts & Admins:** By default fetch personal data (`view_scope=own`). Explicitly pass `?view_scope=all` to compute metrics across the entire application database.\n- **Viewers:** Strictly locked to viewing their own personal metrics.\n",
+    },
+    {
+        "name": "Financial Records",
+        "description": "Manage individual financial transactions.\n\n**Role Capabilities & Constraints:**\n- **Create/Update/Delete:** All users, regardless of role (including Admin), can **only** mutate records directly belonging to their own `user_id`.\n- **Read / List:** Paginated lists & exports support the `?view_scope=own|all` query argument for Analyst/Admin roles to query globally or personally. Viewers can only query their own data.",
+    },
+    {
+        "name": "Admin - User Management",
+        "description": "System-wide administration. Strictly reserved for `ADMIN` role only.",
+    },
+]
+
 app = FastAPI(
     title="Zorvyn Fintech - Finance Dashboard Platform",
     description="Production-grade backend for financial record management, dashboard analytics, and RBAC.",
@@ -32,6 +47,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
+    openapi_tags=tags_metadata,
 )
 
 # Middleware stack (order matters)

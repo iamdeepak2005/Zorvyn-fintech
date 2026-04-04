@@ -25,6 +25,9 @@ async def create_user(data: UserCreate, db: Session = Depends(get_db), admin: Us
     2. Request data is structurally checked against the `UserCreate` Pydantic model (ensuring valid emails & strong passwords).
     3. `UserService.create_user` hashes the password securely using bcrypt, creates the database record,
        and instantly maps an explicit Audit Log ensuring Admins are held accountable for creation.
+       
+    **Access Control:**
+    - **Roles Allowed:** ADMIN only.
     """
     user_service = UserService(db)
     try:
@@ -43,6 +46,9 @@ async def list_users(page: int = Query(1, ge=1), limit: int = Query(20, ge=1, le
     """
     Retrieves a paginated chunk of all registered platform users.
     Only strictly acceptable for execution by the ADMIN tier.
+    
+    **Access Control:**
+    - **Roles Allowed:** ADMIN only.
     """
     user_service = UserService(db)
     users, total = user_service.get_users(page, limit)
@@ -58,6 +64,9 @@ async def update_user(user_id: int, data: UserUpdate, db: Session = Depends(get_
     """
     Updates user specific columns (like 'is_active') via partial patching.
     Leaves an Audit Log trace reflecting the exact action.
+    
+    **Access Control:**
+    - **Roles Allowed:** ADMIN only.
     """
     user_service = UserService(db)
     try:
@@ -75,6 +84,9 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), admin: User =
     """
     Fully restricts the system from allowing an admin to delete themselves.
     Performs physical removal unless a foreign key restrict (like linked financial records) blocks it.
+    
+    **Access Control:**
+    - **Roles Allowed:** ADMIN only.
     """
     user_service = UserService(db)
     try:

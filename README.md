@@ -184,14 +184,14 @@ All endpoints are prefixed with `/api/v1`.
 
 ### Financial Records
 
-| Method | Endpoint          | Description                            |
-| ------ | ----------------- | -------------------------------------- |
-| POST   | `/records`        | Create record (ADMIN)                  |
-| GET    | `/records`        | List records (filtered, paginated)     |
-| GET    | `/records/{id}`   | Get single record (ownership enforced) |
-| PATCH  | `/records/{id}`   | Update record (ADMIN)                  |
-| DELETE | `/records/{id}`   | Soft delete record (ADMIN)             |
-| GET    | `/records/export` | CSV export (ADMIN, ANALYST)            |
+| Method | Endpoint          | Description                                      |
+| ------ | ----------------- | ------------------------------------------------ |
+| POST   | `/records`        | Create record (Authenticated — Own Only)         |
+| GET    | `/records`        | List records (Paginated, filtered, `view_scope`) |
+| GET    | `/records/{id}`   | Get single record (Ownership enforced)           |
+| PATCH  | `/records/{id}`   | Update record (Authenticated — Own Only)         |
+| DELETE | `/records/{id}`   | Soft delete record (Authenticated — Own Only)    |
+| GET    | `/records/export` | CSV export (Auth, `view_scope` support)          |
 
 **Filtering & Sorting:**
 
@@ -226,14 +226,18 @@ GET /api/v1/records?type=EXPENSE&category=Rent&start_date=2026-01-01&end_date=20
 | GET /admin/users         | ✅       | ❌       | ❌       |
 | PATCH /admin/users/{id}  | ✅       | ❌       | ❌       |
 | DELETE /admin/users/{id} | ✅       | ❌       | ❌       |
-| POST /records            | ✅       | ❌       | ❌       |
-| GET /records             | ✅ (all) | ✅ (all) | ❌       |
-| GET /records/{id}        | ✅ (all) | ✅ (all) | ❌       |
-| PATCH /records/{id}      | ✅       | ❌       | ❌       |
-| DELETE /records/{id}     | ✅       | ❌       | ❌       |
-| GET /dashboard/\*        | ✅       | ✅       | ✅       |
-| GET /records/export      | ✅       | ✅       | ❌       |
+| POST /records            | ✅ (own) | ✅ (own) | ✅ (own) |
+| GET /records             | ✅ (all/own)| ✅ (all/own)| ✅ (own) |
+| GET /records/{id}        | ✅       | ✅       | ✅ (own) |
+| PATCH /records/{id}      | ✅ (own) | ✅ (own) | ✅ (own) |
+| DELETE /records/{id}     | ✅ (own) | ✅ (own) | ✅ (own) |
+| GET /dashboard/\*        | ✅ (all/own)| ✅ (all/own)| ✅ (own) |
+| GET /records/export      | ✅ (all/own)| ✅ (all/own)| ✅ (own) |
 | GET /health              | ✅       | ✅       | ✅       |
+
+**Permissions Note:**
+* **`own`**: User can only perform the action on the record tied to their personal `user_id`. (e.g. You cannot update someone else's record, even as an Admin).
+* **`all/own`**: This endpoint supports the `?view_scope` query parameter. Analysts and Admins can explicitly pass `?view_scope=all` to query the entire database, or `?view_scope=own` to restrict the returned view to just their own transactions. Viewers are rigidly forced into `own` scope regardless of parameter.
 
 ---
 

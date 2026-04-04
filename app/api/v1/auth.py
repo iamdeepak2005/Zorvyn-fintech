@@ -22,6 +22,9 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
     2. Takes email and plain-text password from the HTTP JSON body payload.
     3. `AuthService.authenticate` natively fetches the user, verifies the bcrypt hash, 
        checks `is_active` status to prevent suspended logins, and generates the encrypted token payload.
+       
+    **Access Control:**
+    - **Roles Allowed:** Public Access (Anyone)
     """
     auth_service = AuthService(db)
     try:

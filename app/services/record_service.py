@@ -70,8 +70,8 @@ class RecordService:
             self.db.rollback()
             raise
 
-    def get_records(self, filters: RecordFilterParams, user: User) -> Tuple[List[dict], int]:
-        user_id = None if user.role in [UserRole.ADMIN, UserRole.ANALYST] else user.id
+    def get_records(self, filters: RecordFilterParams, user: User, view_scope: str = "own") -> Tuple[List[dict], int]:
+        user_id = None if user.role in [UserRole.ADMIN, UserRole.ANALYST] and view_scope == "all" else user.id
         include_deleted = filters.include_deleted and user.role == UserRole.ADMIN
 
         records, total = self.record_repo.get_filtered(
@@ -105,8 +105,8 @@ class RecordService:
         if not record:
             raise ValueError(f"Record with id {record_id} not found")
 
-        # Ensure user can only update their own records unless they are ADMIN
-        if user.role != UserRole.ADMIN and record.user_id != user.id:
+        # Ensure user can only update their own records
+        if record.user_id != user.id:
             raise PermissionError("You do not have permission to update this record")
 
         try:
@@ -132,8 +132,8 @@ class RecordService:
         if not record:
             raise ValueError(f"Record with id {record_id} not found")
 
-        # Ensure user can only delete their own records unless they are ADMIN
-        if user.role != UserRole.ADMIN and record.user_id != user.id:
+        # Ensure user can only delete their own records
+        if record.user_id != user.id:
             raise PermissionError("You do not have permission to delete this record")
 
         try:
@@ -146,8 +146,8 @@ class RecordService:
             raise
 
     def get_export_records(self, user: User, record_type: Optional[RecordType] = None,
-                           category: Optional[str] = None, start_date=None, end_date=None, search: Optional[str] = None):
-        user_id = None if user.role in [UserRole.ADMIN, UserRole.ANALYST] else user.id
+                           category: Optional[str] = None, start_date=None, end_date=None, search: Optional[str] = None, view_scope: str = "own"):
+        user_id = None if user.role in [UserRole.ADMIN, UserRole.ANALYST] and view_scope == "all" else user.id
         yield from self.record_repo.get_for_export(
             user_id=user_id, record_type=record_type, category=category,
             start_date=start_date, end_date=end_date, search=search,

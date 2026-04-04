@@ -15,25 +15,27 @@ class DashboardService:
         self.db = db
         self.dashboard_repo = DashboardRepository(db)
 
-    def _user_filter(self, user: User) -> Optional[int]:
-        return None if user.role == UserRole.ADMIN else user.id
+    def _user_filter(self, user: User, view_scope: str = "own") -> Optional[int]:
+        if user.role in [UserRole.ADMIN, UserRole.ANALYST] and view_scope == "all":
+            return None
+        return user.id
 
-    def get_summary(self, user: User) -> dict:
-        return self.dashboard_repo.get_summary(self._user_filter(user))
+    def get_summary(self, user: User, view_scope: str = "own") -> dict:
+        return self.dashboard_repo.get_summary(self._user_filter(user, view_scope))
 
-    def get_category_breakdown(self, user: User) -> dict:
-        return self.dashboard_repo.get_category_breakdown(self._user_filter(user))
+    def get_category_breakdown(self, user: User, view_scope: str = "own") -> dict:
+        return self.dashboard_repo.get_category_breakdown(self._user_filter(user, view_scope))
 
-    def get_trends(self, user: User) -> dict:
-        trends = self.dashboard_repo.get_trends(self._user_filter(user))
+    def get_trends(self, user: User, view_scope: str = "own") -> dict:
+        trends = self.dashboard_repo.get_trends(self._user_filter(user, view_scope))
         return {"trends": trends, "granularity": "monthly"}
 
-    def get_recent(self, user: User, page: int = 1, limit: int = 10) -> Tuple[List[dict], int]:
-        records, total = self.dashboard_repo.get_recent_records(self._user_filter(user), page, limit)
+    def get_recent(self, user: User, page: int = 1, limit: int = 10, view_scope: str = "own") -> Tuple[List[dict], int]:
+        records, total = self.dashboard_repo.get_recent_records(self._user_filter(user, view_scope), page, limit)
         return [RecordResponse.model_validate(r).model_dump(mode="json") for r in records], total
 
-    def get_insights(self, user: User) -> dict:
-        uid = self._user_filter(user)
+    def get_insights(self, user: User, view_scope: str = "own") -> dict:
+        uid = self._user_filter(user, view_scope)
 
         top_category = self.dashboard_repo.get_top_spending_category(uid)
         monthly_growth = self.dashboard_repo.get_monthly_growth(uid)
